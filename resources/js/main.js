@@ -16,6 +16,10 @@ const COPY = {
     stepAmount: "Kies een bedrag",
     stepMotivation: "Wat is je drijfveer",
     continue: "Verder",
+    chatTitle: "Samen instellen",
+    chatPlaceholder: "Type hier",
+    chatInputLabel: "Chatbericht",
+    sendMessage: "Verstuur bericht",
   },
   en: {
     documentTitle: "Account overview",
@@ -34,6 +38,10 @@ const COPY = {
     stepAmount: "Choose an amount",
     stepMotivation: "What is your motivation",
     continue: "Continue",
+    chatTitle: "Set up together",
+    chatPlaceholder: "Type here",
+    chatInputLabel: "Chat message",
+    sendMessage: "Send message",
   },
 };
 
@@ -54,9 +62,22 @@ const LANG_STORAGE_KEY = "account-overview-language";
 const languageSwitch = document.querySelector("[data-language-switch]");
 const pages = document.querySelectorAll("[data-page]");
 const openGoalButton = document.querySelector("[data-open-goal]");
+const openChatButton = document.querySelector("[data-open-chat]");
 const backOverviewButton = document.querySelector("[data-back-overview]");
+const backGoalButton = document.querySelector("[data-back-goal]");
 const goalChoices = document.querySelectorAll("[data-goal-choice]");
+const chatMessagesNode = document.querySelector("[data-chat-messages]");
+const chatForm = document.querySelector("[data-chat-form]");
+const chatInput = document.querySelector("[data-chat-input]");
 let currentPage = "overview";
+let chatIsWaiting = false;
+
+const chatMessages = [
+  {
+    role: "agent",
+    text: "test message",
+  },
+];
 
 function getInitialLanguage() {
   const savedLanguage = window.localStorage.getItem(LANG_STORAGE_KEY);
@@ -72,11 +93,27 @@ function setLanguage(language) {
   const copy = COPY[language];
 
   document.documentElement.lang = language === "du" ? "nl" : "en";
-  document.title = currentPage === "goal" ? copy.goalTitle : copy.documentTitle;
+  if (currentPage === "chat") {
+    document.title = copy.chatTitle;
+  } else if (currentPage === "goal") {
+    document.title = copy.goalTitle;
+  } else {
+    document.title = copy.documentTitle;
+  }
 
   document.querySelectorAll("[data-i18n]").forEach((node) => {
     const key = node.dataset.i18n;
     node.textContent = copy[key] || "";
+  });
+
+  document.querySelectorAll("[data-i18n-placeholder]").forEach((node) => {
+    const key = node.dataset.i18nPlaceholder;
+    node.placeholder = copy[key] || "";
+  });
+
+  document.querySelectorAll("[data-i18n-aria-label]").forEach((node) => {
+    const key = node.dataset.i18nAriaLabel;
+    node.setAttribute("aria-label", copy[key] || "");
   });
 
   languageSwitch.textContent = copy.switchTo;
@@ -107,6 +144,11 @@ function showPage(pageName) {
   });
 
   setLanguage(currentLanguage);
+
+  if (pageName === "chat") {
+    renderChatMessages();
+    chatInput.focus();
+  }
 }
 
 function setGoalChoice(selectedChoice) {
@@ -115,6 +157,76 @@ function setGoalChoice(selectedChoice) {
     choice.classList.toggle("active", isSelected);
     choice.setAttribute("aria-pressed", String(isSelected));
   });
+}
+
+function renderChatMessages() {
+  chatMessagesNode.replaceChildren();
+
+  chatMessages.forEach((message) => {
+    const row = document.createElement("div");
+    row.className = `chat-row ${message.role}`;
+
+    if (message.role === "agent") {
+      const avatar = document.createElement("span");
+      avatar.className = "chat-avatar";
+      avatar.setAttribute("aria-hidden", "true");
+
+      const image = document.createElement("img");
+      image.src = "resources/assets/bennie_char.png";
+      image.alt = "";
+      avatar.append(image);
+      row.append(avatar);
+    }
+
+    const bubble = document.createElement("div");
+    bubble.className = `chat-bubble${message.pending ? " pending" : ""}`;
+    bubble.textContent = message.text;
+    row.append(bubble);
+    chatMessagesNode.append(row);
+  });
+
+  chatMessagesNode.scrollTop = chatMessagesNode.scrollHeight;
+}
+
+function setChatWaiting(isWaiting) {
+  chatIsWaiting = isWaiting;
+  chatInput.disabled = isWaiting;
+  chatForm.querySelector("button").disabled = isWaiting;
+}
+
+function queueAgentResponse() {
+  const pendingMessage = {
+    role: "agent",
+    text: "test-message",
+    pending: true,
+  };
+
+  chatMessages.push(pendingMessage);
+  setChatWaiting(true);
+  renderChatMessages();
+
+  window.setTimeout(() => {
+    pendingMessage.text = "test message";
+    pendingMessage.pending = false;
+    setChatWaiting(false);
+    renderChatMessages();
+    chatInput.focus();
+  }, 700);
+}
+
+function sendChatMessage(messageText) {
+  if (!messageText || chatIsWaiting) {
+    return;
+  }
+
+  chatMessages.push({
+    role: "user",
+    text: messageText,
+  });
+
+  chatInput.value = "";
+  renderChatMessages();
+  queueAgentResponse();
 }
 
 let currentLanguage = getInitialLanguage();
@@ -132,11 +244,25 @@ backOverviewButton.addEventListener("click", () => {
   showPage("overview");
 });
 
+backGoalButton.addEventListener("click", () => {
+  showPage("goal");
+});
+
+openChatButton.addEventListener("click", () => {
+  showPage("chat");
+});
+
 goalChoices.forEach((choice) => {
   choice.addEventListener("click", () => {
     setGoalChoice(choice);
   });
 });
 
+chatForm.addEventListener("submit", (event) => {
+  event.preventDefault();
+  sendChatMessage(chatInput.value.trim());
+});
+
 renderAccounts();
+renderChatMessages();
 setLanguage(currentLanguage);

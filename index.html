@@ -93,10 +93,27 @@
             <span data-i18n="setupAlone">Zelf instellen</span>
           </button>
 
-          <button class="continue-button" type="button">
+          <button class="continue-button" type="button" data-open-chat>
             <span data-i18n="continue">Verder</span>
             <span aria-hidden="true">›</span>
           </button>
+        </section>
+
+        <section class="page chat-page" data-page="chat" hidden>
+          <button class="goal-back chat-back" type="button" data-back-goal>
+            <span class="back-arrow" aria-hidden="true">‹</span>
+            <span data-i18n="chatTitle">Samen instellen</span>
+          </button>
+
+          <div class="chat-messages" data-chat-messages aria-live="polite"></div>
+
+          <form class="chat-form" data-chat-form>
+            <label class="visually-hidden" for="chat-input" data-i18n="chatInputLabel">Chatbericht</label>
+            <input id="chat-input" name="message" type="text" autocomplete="off" data-chat-input data-i18n-placeholder="chatPlaceholder" placeholder="Type hier" />
+            <button class="chat-send" type="submit" data-i18n-aria-label="sendMessage" aria-label="Verstuur bericht">
+              <span aria-hidden="true"></span>
+            </button>
+          </form>
         </section>
       </section>
     </main>
