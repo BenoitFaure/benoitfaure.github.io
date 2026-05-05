@@ -1,40 +1,59 @@
-<!DOCTYPE html>
-<html>
-<head>
-	<meta charset="utf-8" name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Benoit FAURE</title>
-  <link href="./resources/css/index.css" type="text/css" rel="stylesheet"> <!-- Problem with add block blocking this resource -->
-</head>
-<body>
-	<!-- onresize="resize()"> -->
+<!doctype html>
+<html lang="nl">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <title>Rekening overzicht</title>
+    <link rel="stylesheet" href="resources/css/index.css" />
+    <script src="resources/js/main.js" defer></script>
+  </head>
+  <body>
+    <main class="phone-shell" aria-labelledby="page-title">
+      <section class="screen">
+        <header class="top-bar">
+          <button class="language-switch" type="button" data-language-switch aria-label="Switch language">EN</button>
+        </header>
 
-	<!-- <canvas id="backgroundCanvas" height="400" width="500"></canvas>
-	<script src="./resources/js/vectors.js"></script>
-	<script src="./resources/js/ship.js"></script>
-	<script src="./resources/js/main.js"></script> -->
+        <div class="page-head">
+          <h1 id="page-title" data-i18n="title">Rekening overzicht</h1>
+        </div>
 
-	<div class="container_row">
+        <nav class="quick-actions" aria-label="Quick actions">
+          <button class="quick-action" type="button">
+            <span data-i18n="transfer">Overschrijven</span>
+          </button>
+          <button class="quick-action" type="button">
+            <span data-i18n="qrScanner">QR-scanner</span>
+          </button>
+          <button class="quick-action" type="button">
+            <span data-i18n="savingsGoal">Spaardoel instellen</span>
+          </button>
+        </nav>
 
-		<div class="layer1">
-			<canvas id="foreground_canvas" width="100" height="100"></canvas>
-		</div>
+        <section class="account-section" aria-labelledby="private-title">
+          <h2 id="private-title" data-i18n="privateSavings">Privé sparen</h2>
+          <button class="account-card" type="button" data-account="private">
+            <span class="account-mark" aria-hidden="true">Sp</span>
+            <span class="account-copy">
+              <span class="account-name" data-account-field="name"></span>
+              <span class="account-number" data-account-field="number"></span>
+            </span>
+            <span class="amount" data-account-field="amount"></span>
+          </button>
+        </section>
 
-		<div class="layer2">
-			<div class="leftsection">
-
-				<h1 class="mainTxt">Hi,<br>I'm Benoit</h1>
-				<div class="buttonsArea">
-					<p class="buttonsTxt">Don't miss the opportunity to</p>
-					<ul class="linkButtons">
-						<li class="buttons"><a href="mailto:benoit.faure.cesar+cv@gmail.com">eMail me</a></li>
-						<li class="buttons"><a href="https://www.linkedin.com/in/benoit-faure/">View my LinkedIn</a></li>
-						<li class="buttons"><a href="resources/files/FAURE_B_EN.pdf">Download my CV</a></li>
-					</ul>
-				</div>
-			</div>
-		</div>
-
-	</div>
-
-</body>
+        <section class="account-section" aria-labelledby="shared-title">
+          <h2 id="shared-title" data-i18n="sharedSavings">Samen sparen</h2>
+          <button class="account-card" type="button" data-account="shared">
+            <span class="account-mark" aria-hidden="true">Sp</span>
+            <span class="account-copy">
+              <span class="account-name" data-account-field="name"></span>
+              <span class="account-number" data-account-field="number"></span>
+            </span>
+            <span class="amount" data-account-field="amount"></span>
+          </button>
+        </section>
+      </section>
+    </main>
+  </body>
 </html>
