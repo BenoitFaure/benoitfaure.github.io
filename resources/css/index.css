@@ -406,7 +406,7 @@ h2 {
   min-height: 78px;
 }
 
-.chat-bubble.pending {
+.thinking-bubble {
   color: var(--muted);
 }
 
