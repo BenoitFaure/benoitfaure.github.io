@@ -5,12 +5,14 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
     <title>Rekening overzicht</title>
     <link rel="stylesheet" href="resources/css/index.css" />
+    <script src="resources/js/config.js" defer></script>
     <script src="resources/js/main.js" defer></script>
   </head>
   <body>
     <main class="phone-shell" aria-labelledby="page-title">
       <section class="screen">
         <header class="top-bar">
+          <button class="api-key-marker" type="button" data-open-api-settings data-i18n-aria-label="openApiSettings" aria-label="Open API settings">@</button>
           <button class="language-switch" type="button" data-language-switch aria-label="Switch language">EN</button>
         </header>
 
@@ -115,6 +117,15 @@
             </button>
           </form>
         </section>
+
+        <div class="api-settings-overlay" data-api-settings-overlay hidden>
+          <form class="api-settings-popup" data-api-settings-form>
+            <h2 data-i18n="openRouterTitle">OpenRouter</h2>
+            <label class="visually-hidden" for="api-key-input" data-i18n="apiKeyLabel">API key</label>
+            <input id="api-key-input" type="password" autocomplete="off" data-api-key-input data-i18n-placeholder="apiKeyPlaceholder" placeholder="API key" />
+            <button class="api-confirm" type="submit" data-i18n="confirmApiKey">Confirm</button>
+          </form>
+        </div>
       </section>
     </main>
   </body>

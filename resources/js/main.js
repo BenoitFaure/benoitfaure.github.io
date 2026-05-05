@@ -20,6 +20,11 @@ const COPY = {
     chatPlaceholder: "Type hier",
     chatInputLabel: "Chatbericht",
     sendMessage: "Verstuur bericht",
+    openApiSettings: "Open API-instellingen",
+    openRouterTitle: "OpenRouter",
+    apiKeyLabel: "API key",
+    apiKeyPlaceholder: "API key",
+    confirmApiKey: "Confirm",
   },
   en: {
     documentTitle: "Account overview",
@@ -42,6 +47,11 @@ const COPY = {
     chatPlaceholder: "Type here",
     chatInputLabel: "Chat message",
     sendMessage: "Send message",
+    openApiSettings: "Open API settings",
+    openRouterTitle: "OpenRouter",
+    apiKeyLabel: "API key",
+    apiKeyPlaceholder: "API key",
+    confirmApiKey: "Confirm",
   },
 };
 
@@ -58,8 +68,24 @@ const account_config = {
   },
 };
 
+const account_settings = {
+  api_key: "",
+};
+
+window.account_settings = account_settings;
+
+const chat_config = window.app_config || {
+  openrouter_model: "google/gemini-2.0-flash-001",
+  context_prompt: "Say monkey.",
+};
+
 const LANG_STORAGE_KEY = "account-overview-language";
+const screen = document.querySelector(".screen");
 const languageSwitch = document.querySelector("[data-language-switch]");
+const openApiSettingsButton = document.querySelector("[data-open-api-settings]");
+const apiSettingsOverlay = document.querySelector("[data-api-settings-overlay]");
+const apiSettingsForm = document.querySelector("[data-api-settings-form]");
+const apiKeyInput = document.querySelector("[data-api-key-input]");
 const pages = document.querySelectorAll("[data-page]");
 const openGoalButton = document.querySelector("[data-open-goal]");
 const openChatButton = document.querySelector("[data-open-chat]");
@@ -71,13 +97,9 @@ const chatForm = document.querySelector("[data-chat-form]");
 const chatInput = document.querySelector("[data-chat-input]");
 let currentPage = "overview";
 let chatIsWaiting = false;
+let hasRequestedInitialAgentMessage = false;
 
-const chatMessages = [
-  {
-    role: "agent",
-    text: "test message",
-  },
-];
+const chatMessages = [];
 
 function getInitialLanguage() {
   const savedLanguage = window.localStorage.getItem(LANG_STORAGE_KEY);
@@ -147,7 +169,11 @@ function showPage(pageName) {
 
   if (pageName === "chat") {
     renderChatMessages();
-    chatInput.focus();
+    requestInitialAgentMessage();
+
+    if (account_settings.api_key) {
+      chatInput.focus();
+    }
   }
 }
 
@@ -194,7 +220,69 @@ function setChatWaiting(isWaiting) {
   chatForm.querySelector("button").disabled = isWaiting;
 }
 
-function queueAgentResponse() {
+function openApiSettings() {
+  apiKeyInput.value = account_settings.api_key;
+  apiSettingsOverlay.hidden = false;
+  screen.classList.add("modal-open");
+  apiKeyInput.focus();
+}
+
+function closeApiSettings() {
+  apiSettingsOverlay.hidden = true;
+  screen.classList.remove("modal-open");
+}
+
+function saveApiKey(apiKey) {
+  account_settings.api_key = apiKey;
+  closeApiSettings();
+
+  if (currentPage === "chat") {
+    requestInitialAgentMessage();
+    chatInput.focus();
+  }
+}
+
+function requireApiKey() {
+  if (account_settings.api_key) {
+    return true;
+  }
+
+  openApiSettings();
+  return false;
+}
+
+async function getChatResponse(userMessage, apiKey) {
+  const response = await fetch("https://openrouter.ai/api/v1/chat/completions", {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${apiKey}`,
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      model: chat_config.openrouter_model,
+      messages: [
+        {
+          role: "user",
+          content: userMessage,
+        },
+      ],
+    }),
+  });
+
+  const data = await response.json();
+
+  if (!response.ok) {
+    throw new Error(data.error?.message || "OpenRouter request failed");
+  }
+
+  return data.choices?.[0]?.message?.content || "";
+}
+
+async function queueAgentResponse(prompt) {
+  if (!requireApiKey()) {
+    return;
+  }
+
   const pendingMessage = {
     role: "agent",
     text: "test-message",
@@ -205,17 +293,40 @@ function queueAgentResponse() {
   setChatWaiting(true);
   renderChatMessages();
 
-  window.setTimeout(() => {
-    pendingMessage.text = "test message";
+  try {
+    pendingMessage.text = await getChatResponse(prompt, account_settings.api_key);
+  } catch (error) {
+    pendingMessage.text = error.message;
+  } finally {
     pendingMessage.pending = false;
     setChatWaiting(false);
     renderChatMessages();
-    chatInput.focus();
-  }, 700);
+
+    if (currentPage === "chat") {
+      chatInput.focus();
+    }
+  }
+}
+
+function requestInitialAgentMessage() {
+  if (hasRequestedInitialAgentMessage || chatMessages.length > 0 || chatIsWaiting) {
+    return;
+  }
+
+  if (!requireApiKey()) {
+    return;
+  }
+
+  hasRequestedInitialAgentMessage = true;
+  queueAgentResponse(chat_config.context_prompt);
 }
 
 function sendChatMessage(messageText) {
   if (!messageText || chatIsWaiting) {
+    return;
+  }
+
+  if (!requireApiKey()) {
     return;
   }
 
@@ -226,7 +337,7 @@ function sendChatMessage(messageText) {
 
   chatInput.value = "";
   renderChatMessages();
-  queueAgentResponse();
+  queueAgentResponse(messageText);
 }
 
 let currentLanguage = getInitialLanguage();
@@ -234,6 +345,27 @@ let currentLanguage = getInitialLanguage();
 languageSwitch.addEventListener("click", () => {
   currentLanguage = currentLanguage === "du" ? "en" : "du";
   setLanguage(currentLanguage);
+});
+
+openApiSettingsButton.addEventListener("click", () => {
+  openApiSettings();
+});
+
+apiSettingsOverlay.addEventListener("click", (event) => {
+  if (event.target === apiSettingsOverlay) {
+    closeApiSettings();
+  }
+});
+
+apiSettingsForm.addEventListener("submit", (event) => {
+  event.preventDefault();
+  saveApiKey(apiKeyInput.value.trim());
+});
+
+document.addEventListener("keydown", (event) => {
+  if (event.key === "Escape" && !apiSettingsOverlay.hidden) {
+    closeApiSettings();
+  }
 });
 
 openGoalButton.addEventListener("click", () => {
