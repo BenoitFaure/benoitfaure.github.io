@@ -14,43 +14,88 @@
           <button class="language-switch" type="button" data-language-switch aria-label="Switch language">EN</button>
         </header>
 
-        <div class="page-head">
-          <h1 id="page-title" data-i18n="title">Rekening overzicht</h1>
-        </div>
+        <section class="page overview-page" data-page="overview">
+          <div class="page-head">
+            <h1 id="page-title" data-i18n="title">Rekening overzicht</h1>
+          </div>
 
-        <nav class="quick-actions" aria-label="Quick actions">
-          <button class="quick-action" type="button">
-            <span data-i18n="transfer">Overschrijven</span>
-          </button>
-          <button class="quick-action" type="button">
-            <span data-i18n="qrScanner">QR-scanner</span>
-          </button>
-          <button class="quick-action" type="button">
-            <span data-i18n="savingsGoal">Spaardoel instellen</span>
-          </button>
-        </nav>
+          <nav class="quick-actions" aria-label="Quick actions">
+            <button class="quick-action" type="button">
+              <span data-i18n="transfer">Overschrijven</span>
+            </button>
+            <button class="quick-action" type="button">
+              <span data-i18n="qrScanner">QR-scanner</span>
+            </button>
+            <button class="quick-action" type="button" data-open-goal>
+              <span data-i18n="savingsGoal">Spaardoel instellen</span>
+            </button>
+          </nav>
 
-        <section class="account-section" aria-labelledby="private-title">
-          <h2 id="private-title" data-i18n="privateSavings">Privé sparen</h2>
-          <button class="account-card" type="button" data-account="private">
-            <span class="account-mark" aria-hidden="true">Sp</span>
-            <span class="account-copy">
-              <span class="account-name" data-account-field="name"></span>
-              <span class="account-number" data-account-field="number"></span>
-            </span>
-            <span class="amount" data-account-field="amount"></span>
-          </button>
+          <section class="account-section" aria-labelledby="private-title">
+            <h2 id="private-title" data-i18n="privateSavings">Privé sparen</h2>
+            <button class="account-card" type="button" data-account="private">
+              <span class="account-mark" aria-hidden="true">Sp</span>
+              <span class="account-copy">
+                <span class="account-name" data-account-field="name"></span>
+                <span class="account-number" data-account-field="number"></span>
+              </span>
+              <span class="amount" data-account-field="amount"></span>
+            </button>
+          </section>
+
+          <section class="account-section" aria-labelledby="shared-title">
+            <h2 id="shared-title" data-i18n="sharedSavings">Samen sparen</h2>
+            <button class="account-card" type="button" data-account="shared">
+              <span class="account-mark" aria-hidden="true">Sp</span>
+              <span class="account-copy">
+                <span class="account-name" data-account-field="name"></span>
+                <span class="account-number" data-account-field="number"></span>
+              </span>
+              <span class="amount" data-account-field="amount"></span>
+            </button>
+          </section>
         </section>
 
-        <section class="account-section" aria-labelledby="shared-title">
-          <h2 id="shared-title" data-i18n="sharedSavings">Samen sparen</h2>
-          <button class="account-card" type="button" data-account="shared">
-            <span class="account-mark" aria-hidden="true">Sp</span>
-            <span class="account-copy">
-              <span class="account-name" data-account-field="name"></span>
-              <span class="account-number" data-account-field="number"></span>
-            </span>
-            <span class="amount" data-account-field="amount"></span>
+        <section class="page goal-page" data-page="goal" hidden>
+          <button class="goal-back" type="button" data-back-overview>
+            <span class="back-arrow" aria-hidden="true">‹</span>
+            <span data-i18n="goalTitle">Spaardoel instellen</span>
+          </button>
+
+          <div class="goal-hero" aria-hidden="true">
+            <img src="resources/assets/bennie_char.png" alt="" />
+          </div>
+
+          <button class="goal-choice goal-choice-top active" type="button" data-goal-choice="together" aria-pressed="true">
+            <span data-i18n="setupTogether">Samen instellen</span>
+          </button>
+
+          <article class="coach-card">
+            <p data-i18n="goalIntro">Het is geweldig dat je een doel wilt stellen. Laten we hier samen aan werken, ik zal je helpen om je doel een diepere betekenis te geven.</p>
+          </article>
+
+          <div class="goal-steps" aria-label="Goal setup steps">
+            <div class="goal-step">
+              <strong>1</strong>
+              <span data-i18n="stepName">Geef je goal een naam</span>
+            </div>
+            <div class="goal-step">
+              <strong>2</strong>
+              <span data-i18n="stepAmount">Kies een bedrag</span>
+            </div>
+            <div class="goal-step">
+              <strong>3</strong>
+              <span data-i18n="stepMotivation">Wat is je drijfveer</span>
+            </div>
+          </div>
+
+          <button class="goal-choice goal-choice-bottom" type="button" data-goal-choice="alone" aria-pressed="false">
+            <span data-i18n="setupAlone">Zelf instellen</span>
+          </button>
+
+          <button class="continue-button" type="button">
+            <span data-i18n="continue">Verder</span>
+            <span aria-hidden="true">›</span>
           </button>
         </section>
       </section>
