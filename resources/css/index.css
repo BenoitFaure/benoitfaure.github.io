@@ -57,9 +57,11 @@ button {
   display: flex;
   align-items: center;
   justify-content: flex-end;
+  gap: 10px;
   margin-bottom: 44px;
 }
 
+.api-key-marker,
 .language-switch {
   border: 1px solid rgba(255, 255, 255, 0.34);
   border-radius: 999px;
@@ -71,6 +73,12 @@ button {
   letter-spacing: 0.06em;
   line-height: 1;
   padding: 8px 11px;
+}
+
+.api-key-marker {
+  width: 35px;
+  height: 35px;
+  padding: 0;
 }
 
 .page-head {
@@ -150,6 +158,7 @@ h2 {
 
 .account-card:active,
 .quick-action:active,
+.api-key-marker:active,
 .language-switch:active {
   transform: translateY(1px);
 }
@@ -452,6 +461,68 @@ h2 {
 .chat-send:disabled,
 .chat-form input:disabled {
   opacity: 0.62;
+}
+
+.screen.modal-open > .top-bar,
+.screen.modal-open > .page {
+  filter: blur(4px);
+}
+
+.api-settings-overlay {
+  position: absolute;
+  inset: 0;
+  z-index: 20;
+  display: grid;
+  place-items: center;
+  background: rgba(42, 0, 22, 0.42);
+  padding: 26px;
+  backdrop-filter: blur(7px);
+}
+
+.api-settings-overlay[hidden] {
+  display: none;
+}
+
+.api-settings-popup {
+  display: grid;
+  width: min(100%, 340px);
+  gap: 18px;
+  border-radius: 18px;
+  background: var(--panel);
+  box-shadow: 0 26px 70px rgba(0, 0, 0, 0.38);
+  padding: 28px 22px 22px;
+}
+
+.api-settings-popup h2 {
+  margin-bottom: 2px;
+  text-align: center;
+}
+
+.api-settings-popup input {
+  width: 100%;
+  border: 1px solid rgba(255, 255, 255, 0.32);
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.08);
+  color: var(--white);
+  font: inherit;
+  font-size: 18px;
+  outline: 0;
+  padding: 15px 14px;
+}
+
+.api-settings-popup input::placeholder {
+  color: var(--muted);
+}
+
+.api-confirm {
+  border: 0;
+  border-radius: 12px;
+  background: var(--white);
+  color: #15000c;
+  cursor: pointer;
+  font-size: 20px;
+  font-weight: 850;
+  padding: 14px;
 }
 
 @media (max-width: 370px) {
