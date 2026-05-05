@@ -100,6 +100,10 @@ let chatIsWaiting = false;
 let hasRequestedInitialAgentMessage = false;
 
 const chatMessages = [];
+const openrouterMessages = [];
+
+window.chatMessages = chatMessages;
+window.openrouterMessages = openrouterMessages;
 
 function getInitialLanguage() {
   const savedLanguage = window.localStorage.getItem(LANG_STORAGE_KEY);
@@ -205,11 +209,32 @@ function renderChatMessages() {
     }
 
     const bubble = document.createElement("div");
-    bubble.className = `chat-bubble${message.pending ? " pending" : ""}`;
+    bubble.className = "chat-bubble";
     bubble.textContent = message.text;
     row.append(bubble);
     chatMessagesNode.append(row);
   });
+
+  if (chatIsWaiting) {
+    const row = document.createElement("div");
+    row.className = "chat-row agent thinking-row";
+
+    const avatar = document.createElement("span");
+    avatar.className = "chat-avatar";
+    avatar.setAttribute("aria-hidden", "true");
+
+    const image = document.createElement("img");
+    image.src = "resources/assets/bennie_char.png";
+    image.alt = "";
+    avatar.append(image);
+    row.append(avatar);
+
+    const bubble = document.createElement("div");
+    bubble.className = "chat-bubble thinking-bubble";
+    bubble.textContent = "Thinking...";
+    row.append(bubble);
+    chatMessagesNode.append(row);
+  }
 
   chatMessagesNode.scrollTop = chatMessagesNode.scrollHeight;
 }
@@ -251,7 +276,7 @@ function requireApiKey() {
   return false;
 }
 
-async function getChatResponse(userMessage, apiKey) {
+async function getChatResponse(messages, apiKey) {
   const response = await fetch("https://openrouter.ai/api/v1/chat/completions", {
     method: "POST",
     headers: {
@@ -260,12 +285,10 @@ async function getChatResponse(userMessage, apiKey) {
     },
     body: JSON.stringify({
       model: chat_config.openrouter_model,
-      messages: [
-        {
-          role: "user",
-          content: userMessage,
-        },
-      ],
+      messages,
+      reasoning: {
+        enabled: true,
+      },
     }),
   });
 
@@ -275,30 +298,39 @@ async function getChatResponse(userMessage, apiKey) {
     throw new Error(data.error?.message || "OpenRouter request failed");
   }
 
-  return data.choices?.[0]?.message?.content || "";
+  return data.choices?.[0]?.message || { content: "" };
 }
 
-async function queueAgentResponse(prompt) {
+async function queueAgentResponse() {
   if (!requireApiKey()) {
     return;
   }
 
-  const pendingMessage = {
-    role: "agent",
-    text: "test-message",
-    pending: true,
-  };
-
-  chatMessages.push(pendingMessage);
   setChatWaiting(true);
   renderChatMessages();
 
   try {
-    pendingMessage.text = await getChatResponse(prompt, account_settings.api_key);
+    const responseMessage = await getChatResponse(openrouterMessages, account_settings.api_key);
+    const assistantMessage = {
+      role: "assistant",
+      content: responseMessage.content || "",
+    };
+
+    if (responseMessage.reasoning_details !== undefined) {
+      assistantMessage.reasoning_details = responseMessage.reasoning_details;
+    }
+
+    openrouterMessages.push(assistantMessage);
+    chatMessages.push({
+      role: "agent",
+      text: assistantMessage.content,
+    });
   } catch (error) {
-    pendingMessage.text = error.message;
+    chatMessages.push({
+      role: "agent",
+      text: error.message,
+    });
   } finally {
-    pendingMessage.pending = false;
     setChatWaiting(false);
     renderChatMessages();
 
@@ -309,7 +341,7 @@ async function queueAgentResponse(prompt) {
 }
 
 function requestInitialAgentMessage() {
-  if (hasRequestedInitialAgentMessage || chatMessages.length > 0 || chatIsWaiting) {
+  if (hasRequestedInitialAgentMessage || openrouterMessages.length > 0 || chatIsWaiting) {
     return;
   }
 
@@ -318,7 +350,11 @@ function requestInitialAgentMessage() {
   }
 
   hasRequestedInitialAgentMessage = true;
-  queueAgentResponse(chat_config.context_prompt);
+  openrouterMessages.push({
+    role: "user",
+    content: chat_config.context_prompt,
+  });
+  queueAgentResponse();
 }
 
 function sendChatMessage(messageText) {
@@ -334,10 +370,14 @@ function sendChatMessage(messageText) {
     role: "user",
     text: messageText,
   });
+  openrouterMessages.push({
+    role: "user",
+    content: messageText,
+  });
 
   chatInput.value = "";
   renderChatMessages();
-  queueAgentResponse(messageText);
+  queueAgentResponse();
 }
 
 let currentLanguage = getInitialLanguage();
