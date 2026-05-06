@@ -59,41 +59,43 @@
         </section>
 
         <section class="page goal-page" data-page="goal" hidden>
-          <button class="goal-back" type="button" data-back-overview>
-            <span class="back-arrow" aria-hidden="true">‹</span>
-            <span data-i18n="goalTitle">Spaardoel instellen</span>
-          </button>
+          <div class="goal-scroll">
+            <button class="goal-back" type="button" data-back-overview>
+              <span class="back-arrow" aria-hidden="true">‹</span>
+              <span data-i18n="goalTitle">Spaardoel instellen</span>
+            </button>
 
-          <div class="goal-hero" aria-hidden="true">
-            <img src="resources/assets/bennie_char.png" alt="" />
+            <div class="goal-hero" aria-hidden="true">
+              <img src="resources/assets/bennie_char.png" alt="" />
+            </div>
+
+            <button class="goal-choice goal-choice-top active" type="button" data-goal-choice="together" aria-pressed="true">
+              <span data-i18n="setupTogether">Samen instellen</span>
+            </button>
+
+            <article class="coach-card">
+              <p data-i18n="goalIntro">Het is geweldig dat je een doel wilt stellen. Laten we hier samen aan werken, ik zal je helpen om je doel een diepere betekenis te geven.</p>
+            </article>
+
+            <div class="goal-steps" aria-label="Goal setup steps">
+              <div class="goal-step">
+                <strong>1</strong>
+                <span data-i18n="stepName">Geef je goal een naam</span>
+              </div>
+              <div class="goal-step">
+                <strong>2</strong>
+                <span data-i18n="stepAmount">Kies een bedrag</span>
+              </div>
+              <div class="goal-step">
+                <strong>3</strong>
+                <span data-i18n="stepMotivation">Wat is je drijfveer</span>
+              </div>
+            </div>
+
+            <button class="goal-choice goal-choice-bottom" type="button" data-goal-choice="alone" aria-pressed="false">
+              <span data-i18n="setupAlone">Zelf instellen</span>
+            </button>
           </div>
-
-          <button class="goal-choice goal-choice-top active" type="button" data-goal-choice="together" aria-pressed="true">
-            <span data-i18n="setupTogether">Samen instellen</span>
-          </button>
-
-          <article class="coach-card">
-            <p data-i18n="goalIntro">Het is geweldig dat je een doel wilt stellen. Laten we hier samen aan werken, ik zal je helpen om je doel een diepere betekenis te geven.</p>
-          </article>
-
-          <div class="goal-steps" aria-label="Goal setup steps">
-            <div class="goal-step">
-              <strong>1</strong>
-              <span data-i18n="stepName">Geef je goal een naam</span>
-            </div>
-            <div class="goal-step">
-              <strong>2</strong>
-              <span data-i18n="stepAmount">Kies een bedrag</span>
-            </div>
-            <div class="goal-step">
-              <strong>3</strong>
-              <span data-i18n="stepMotivation">Wat is je drijfveer</span>
-            </div>
-          </div>
-
-          <button class="goal-choice goal-choice-bottom" type="button" data-goal-choice="alone" aria-pressed="false">
-            <span data-i18n="setupAlone">Zelf instellen</span>
-          </button>
 
           <button class="continue-button" type="button" data-open-chat>
             <span data-i18n="continue">Verder</span>
