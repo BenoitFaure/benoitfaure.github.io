@@ -24,6 +24,8 @@ const COPY = {
     openRouterTitle: "OpenRouter",
     apiKeyLabel: "API key",
     apiKeyPlaceholder: "API key",
+    openRouterModelLabel: "OpenRouter model",
+    openRouterModelPlaceholder: "OpenRouter model",
     confirmApiKey: "Confirm",
   },
   en: {
@@ -51,6 +53,8 @@ const COPY = {
     openRouterTitle: "OpenRouter",
     apiKeyLabel: "API key",
     apiKeyPlaceholder: "API key",
+    openRouterModelLabel: "OpenRouter model",
+    openRouterModelPlaceholder: "OpenRouter model",
     confirmApiKey: "Confirm",
   },
 };
@@ -68,16 +72,17 @@ const account_config = {
   },
 };
 
-const account_settings = {
-  api_key: "",
-};
-
-window.account_settings = account_settings;
-
 const chat_config = window.app_config || {
   openrouter_model: "google/gemini-2.0-flash-001",
   context_prompt: "Say monkey.",
 };
+
+const account_settings = {
+  api_key: "",
+  openrouter_model: chat_config.openrouter_model,
+};
+
+window.account_settings = account_settings;
 
 const LANG_STORAGE_KEY = "account-overview-language";
 const screen = document.querySelector(".screen");
@@ -86,6 +91,7 @@ const openApiSettingsButton = document.querySelector("[data-open-api-settings]")
 const apiSettingsOverlay = document.querySelector("[data-api-settings-overlay]");
 const apiSettingsForm = document.querySelector("[data-api-settings-form]");
 const apiKeyInput = document.querySelector("[data-api-key-input]");
+const openrouterModelInput = document.querySelector("[data-openrouter-model-input]");
 const pages = document.querySelectorAll("[data-page]");
 const openGoalButton = document.querySelector("[data-open-goal]");
 const openChatButton = document.querySelector("[data-open-chat]");
@@ -247,6 +253,7 @@ function setChatWaiting(isWaiting) {
 
 function openApiSettings() {
   apiKeyInput.value = account_settings.api_key;
+  openrouterModelInput.value = account_settings.openrouter_model;
   apiSettingsOverlay.hidden = false;
   screen.classList.add("modal-open");
   apiKeyInput.focus();
@@ -257,8 +264,9 @@ function closeApiSettings() {
   screen.classList.remove("modal-open");
 }
 
-function saveApiKey(apiKey) {
+function saveApiSettings(apiKey, openrouterModel) {
   account_settings.api_key = apiKey;
+  account_settings.openrouter_model = openrouterModel || chat_config.openrouter_model;
   closeApiSettings();
 
   if (currentPage === "chat") {
@@ -284,7 +292,7 @@ async function getChatResponse(messages, apiKey) {
       "Content-Type": "application/json",
     },
     body: JSON.stringify({
-      model: chat_config.openrouter_model,
+      model: account_settings.openrouter_model,
       messages,
       reasoning: {
         enabled: true,
@@ -399,7 +407,7 @@ apiSettingsOverlay.addEventListener("click", (event) => {
 
 apiSettingsForm.addEventListener("submit", (event) => {
   event.preventDefault();
-  saveApiKey(apiKeyInput.value.trim());
+  saveApiSettings(apiKeyInput.value.trim(), openrouterModelInput.value.trim());
 });
 
 document.addEventListener("keydown", (event) => {
